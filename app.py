@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-
+import numpy as np
 st.title("EC2 Instance EDA Dashboard")
 
 df = pd.read_csv("ec2dataset.csv")
@@ -427,7 +427,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 st.subheader("Step 7: Model Evaluation")
 
-y_pred = model.predict(X_test)
+y_pred = np.expm1(model.predict(X_test))
 
 mae = mean_absolute_error(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
@@ -469,7 +469,6 @@ fig.add_scatter(
 st.plotly_chart(fig, use_container_width=True)
 # Step 9 - Make Predictions
 
-# Step 9 - Make Predictions
 
 st.subheader("Predict EC2 Instance Cost")
 
@@ -478,24 +477,10 @@ new_instance = pd.DataFrame(
     columns=["Memory_GiB", "vCPU_Count"]
 )
 
-# Predict cost using Linear Regression
-raw_prediction = model.predict(new_instance)[0]
+predicted_cost = np.expm1(
+    model.predict(new_instance)
+)[0]
 
-# Prevent negative cost estimates
-predicted_cost = max(0, raw_prediction)
-
-if raw_prediction >= 0:
-    st.success(
-        f"Predicted On-Demand Cost: ${predicted_cost:.4f}/hour"
-    )
-else:
-    st.warning(
-        "The model predicted a negative cost. "
-        "A valid price estimate could not be produced "
-        "for this instance configuration."
-    )
-    st.write(
-        f"Adjusted non-negative estimate: ${predicted_cost:.4f}/hour"
-    )
-
-
+st.success(
+    f"Predicted On-Demand Cost: ${max(0, predicted_cost):.4f}/hour"
+)
