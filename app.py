@@ -398,4 +398,40 @@ st.download_button(
     mime="text/csv"
 )
 
-#Part 24 — Challenge 1: Network Filtering
+# PART 2 - REGRESSION ANALYSIS
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+st.header("EC2 Cost Prediction Using Regression")
+
+# Prepare data
+regression_df = df.dropna(
+    subset=["Memory_GiB", "vCPU_Count", "On Demand_USD"]
+)
+
+X = regression_df[["Memory_GiB", "vCPU_Count"]]
+y = regression_df["On Demand_USD"]
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Step 9 - Make Predictions
+st.subheader("Predict EC2 Instance Cost")
+
+new_instance = pd.DataFrame(
+    [[4, 2]],
+    columns=["Memory_GiB", "vCPU_Count"]
+)
+
+predicted_cost = model.predict(new_instance)
+
+st.success(
+    f"Predicted On-Demand Cost: ${predicted_cost[0]:.4f}/hour"
+)
