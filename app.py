@@ -509,17 +509,4 @@ st.success(
     f"Predicted On-Demand Cost: ${predicted_cost:.6f}/hour"
 )
 
-# Step 9 - Make Predictions
 
-st.subheader("Predict EC2 Instance Cost")
-
-new_instance = pd.DataFrame(
-    [[4, 2]],
-    columns=["Memory_GiB", "vCPU_Count"]
-)
-
-predicted_cost = np.exp(model.predict(new_instance))[0]
-
-st.success(
-    f"Predicted On-Demand Cost: ${predicted_cost:.6f}/hour"
-)
