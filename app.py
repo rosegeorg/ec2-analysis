@@ -430,8 +430,13 @@ new_instance = pd.DataFrame(
     columns=["Memory_GiB", "vCPU_Count"]
 )
 
-predicted_cost = model.predict(new_instance)
+predicted_cost = model.predict(new_instance)[0]
 
-st.success(
-    f"Predicted On-Demand Cost: ${predicted_cost[0]:.4f}/hour"
-)
+st.write(f"Raw Model Prediction: ${predicted_cost:.4f}/hour")
+
+if predicted_cost < 0:
+    st.warning(
+        "The model predicted a negative cost. "
+        "This indicates a limitation of the Linear Regression model."
+    )
+
