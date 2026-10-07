@@ -471,6 +471,44 @@ fig.add_scatter(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
+
+# Step 9 - Interactive EC2 Cost Prediction
+
+st.subheader("Predict EC2 Instance Cost")
+
+# Enter memory
+predict_memory = st.number_input(
+    "Enter Memory (GiB)",
+    min_value=0.5,
+    value=4.0,
+    step=0.5
+)
+
+# Enter vCPUs
+predict_cpu = st.number_input(
+    "Enter Number of vCPUs",
+    min_value=1,
+    value=2,
+    step=1
+)
+
+# Create new instance
+new_instance = pd.DataFrame(
+    [[predict_memory, predict_cpu]],
+    columns=["Memory_GiB", "vCPU_Count"]
+)
+
+# Predict cost
+predicted_cost = np.exp(
+    model.predict(new_instance)
+)[0]
+
+# Display prediction
+st.success(
+    f"Predicted On-Demand Cost: ${predicted_cost:.6f}/hour"
+)
+
 # Step 9 - Make Predictions
 
 st.subheader("Predict EC2 Instance Cost")
