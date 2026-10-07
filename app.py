@@ -468,6 +468,9 @@ fig.add_scatter(
 
 st.plotly_chart(fig, use_container_width=True)
 # Step 9 - Make Predictions
+
+# Step 9 - Make Predictions
+
 st.subheader("Predict EC2 Instance Cost")
 
 new_instance = pd.DataFrame(
@@ -475,13 +478,24 @@ new_instance = pd.DataFrame(
     columns=["Memory_GiB", "vCPU_Count"]
 )
 
-predicted_cost = model.predict(new_instance)[0]
+# Predict cost using Linear Regression
+raw_prediction = model.predict(new_instance)[0]
 
-st.write(f"Raw Model Prediction: ${predicted_cost:.4f}/hour")
+# Prevent negative cost estimates
+predicted_cost = max(0, raw_prediction)
 
-if predicted_cost < 0:
+if raw_prediction >= 0:
+    st.success(
+        f"Predicted On-Demand Cost: ${predicted_cost:.4f}/hour"
+    )
+else:
     st.warning(
         "The model predicted a negative cost. "
-        "This indicates a limitation of the Linear Regression model."
+        "A valid price estimate could not be produced "
+        "for this instance configuration."
     )
+    st.write(
+        f"Adjusted non-negative estimate: ${predicted_cost:.4f}/hour"
+    )
+
 
