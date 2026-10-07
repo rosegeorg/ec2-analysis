@@ -476,7 +476,7 @@ st.plotly_chart(fig, use_container_width=True)
 st.subheader("Predict EC2 Instance Cost")
 
 new_instance = pd.DataFrame(
-    [[6, 2]],
+    [[4, 2]],
     columns=["Memory_GiB", "vCPU_Count"]
 )
 
