@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import numpy as np
+
 st.title("EC2 Instance EDA Dashboard")
 
 df = pd.read_csv("ec2dataset.csv")
@@ -419,15 +419,19 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # Train model
-model = LinearRegression()
-model.fit(X_train, y_train)
+from sklearn.linear_model import Ridge
+import numpy as np
+
+# Train model using log-transformed costs
+model = Ridge(alpha=10.0)
+model.fit(X_train, np.log(y_train.clip(lower=0.000001)))
 # Step 7 - Evaluate the Model
 
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 st.subheader("Step 7: Model Evaluation")
 
-y_pred = np.expm1(model.predict(X_test))
+y_pred = np.exp(model.predict(X_test))
 
 mae = mean_absolute_error(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
@@ -469,7 +473,6 @@ fig.add_scatter(
 st.plotly_chart(fig, use_container_width=True)
 # Step 9 - Make Predictions
 
-
 st.subheader("Predict EC2 Instance Cost")
 
 new_instance = pd.DataFrame(
@@ -477,10 +480,8 @@ new_instance = pd.DataFrame(
     columns=["Memory_GiB", "vCPU_Count"]
 )
 
-predicted_cost = np.expm1(
-    model.predict(new_instance)
-)[0]
+predicted_cost = np.exp(model.predict(new_instance))[0]
 
 st.success(
-    f"Predicted On-Demand Cost: ${max(0, predicted_cost):.4f}/hour"
+    f"Predicted On-Demand Cost: ${predicted_cost:.6f}/hour"
 )
