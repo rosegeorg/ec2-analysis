@@ -421,7 +421,52 @@ X_train, X_test, y_train, y_test = train_test_split(
 # Train model
 model = LinearRegression()
 model.fit(X_train, y_train)
+# Step 7 - Evaluate the Model
 
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+st.subheader("Step 7: Model Evaluation")
+
+y_pred = model.predict(X_test)
+
+mae = mean_absolute_error(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
+rmse = mse ** 0.5
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("MAE", f"{mae:.4f}")
+col2.metric("MSE", f"{mse:.4f}")
+col3.metric("RMSE", f"{rmse:.4f}")
+
+
+# Step 8 - Visualize the Results
+
+st.subheader("Step 8: Actual vs Predicted Costs")
+
+fig = px.scatter(
+    x=y_test,
+    y=y_pred,
+    labels={
+        "x": "Actual On-Demand Cost ($/hour)",
+        "y": "Predicted On-Demand Cost ($/hour)"
+    },
+    title="Actual vs Predicted EC2 Costs"
+)
+
+# Add perfect prediction reference line
+min_value = min(y_test.min(), y_pred.min())
+max_value = max(y_test.max(), y_pred.max())
+
+fig.add_scatter(
+    x=[min_value, max_value],
+    y=[min_value, max_value],
+    mode="lines",
+    name="Perfect Prediction",
+    line=dict(color="red", dash="dash")
+)
+
+st.plotly_chart(fig, use_container_width=True)
 # Step 9 - Make Predictions
 st.subheader("Predict EC2 Instance Cost")
 
